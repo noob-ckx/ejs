@@ -1,0 +1,161 @@
+<style>
+    #rootTable {
+        line-height: 32px;
+    }
+
+    #rootTable li {
+        box-sizing: border-box;
+        border-bottom: 0.5px dashed #dddddd;
+    }
+
+    #rootTable ul {
+        box-sizing: border-box;
+        border-top: 0.5px dashed #dddddd;
+    }
+</style>
+<div class="layui-card" id="treeButtonGroup" >
+    <div class="layui-card-header">树形图</div>
+    <div class="layui-card-body">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">选择根节点</label>
+                        <div class="layui-input-block">
+                        <select name="rootId" lay-filter="root-tree" id="root-tree">
+                            <!-- <option value="0">写作</option>
+                            <option value="1">阅读</option> -->
+                        </select>
+                        </div>
+                    </div>
+                </form>
+                <form class="layui-form" style="min-width: 500px;overflow-y: auto;">
+                    <div style="font-size: 15px;line-height: 35px;border: 1px dashed #cccccc;padding:0 10px;">
+                        <span>名称</span>
+                        <span style="float: right;">
+                                <span style="width: 240px;display: inline-block;text-align:center;">操作</span>
+                            </span>
+                    </div>
+                    <div id="rootTable"
+                            style="box-sizing: border-box;border-left:1px dashed #cccccc;border-right:1px dashed #cccccc;padding:0 10px;"></div>
+                </form>
+                <!-- <div id="rootTable"
+                 style="box-sizing: border-box;border-left:1px dashed #cccccc;border-right:1px dashed #cccccc;padding:0 10px;">
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form'],function(){
+        var $ = layui.$,
+            form = layui.form;
+            
+        var active = {
+            getBaseInfo:function(){
+                $.ajax({
+                    url:'/data/rootList',
+                    method: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    success:function(res){
+                        var rootArr = res.data;
+                        var str = "<option value=''></option>";
+                        for(let i = 0 ; i < rootArr.length ;i++){
+                            str += "<option value='"+ rootArr[i].id +"'>" + rootArr[i].title+ "</option>"
+                        }
+                        $("#root-tree").html(str);
+                        form.render('select');
+                    }
+                })
+            },
+            getTree:function(id){
+                $.ajax({
+                    url:'/data/rootchild?id=' + id,
+                    method: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    success:function(res){
+                        new layuiBasicTree({
+                            elem: 'rootTable',
+                            form: form,
+                            data: [res],
+                            disableClick: true,
+                            operateRender: function (data) {
+                                return '<span style="width: 240px;display: inline-block;text-align: center;"><a class="layui-btn layui-btn-xs" id="' + data.id + '" rootid="' + data.rootid + '" data-method="edit">修改</a>' +
+                                '<a class="layui-btn layui-btn-warm layui-btn-xs" id="' + data.id + '" rootid="' + data.rootid + '" data-method="add">添加下级</a>' +
+                                '<a class="layui-btn layui-btn-danger layui-btn-xs" id="' + data.id + '" rootid="' + data.rootid + '" data-method="del">删除</a></span>';
+                            }
+                        });
+                        // +
+                        //         '<a class="layui-btn layui-btn-normal layui-btn-xs" id="' + data.id + '" rootid="' + data.rootid + '" data-method="detail">详细</a>' +
+                    }
+                })
+            },
+            edit:function(othis){
+                var id = $(othis).attr('id');
+                layer.open({
+                    type: 2,
+                    title: '修改根节点',
+                    area: ['500px', '200px'],
+                    maxmin: true,
+                    content: '/edit?id=' +id,
+                    end: function () {
+                        var id = $("#root-tree").val();
+                        active.getTree(id);
+                    }
+                });
+            },
+            add:function(othis){
+                var id = $(othis).attr('id');
+                var rootid = $(othis).attr('rootid');
+                layer.open({
+                    type: 2,
+                    title: '添加下级',
+                    area: ['500px', '200px'],
+                    maxmin: true,
+                    content: '/tree/add?id=' + id + '&rootid=' + rootid,
+                    end: function () {
+                        var id = $("#root-tree").val();
+                        active.getTree(id);
+                    }
+                });
+            },
+            del:function(othis){
+                var id = $(othis).attr('id');
+                layer.confirm("确定删除吗？", {
+                        title: "警告",
+                        btn: ['确认', '取消']
+                    },
+                    function (index) {
+                        $.ajax({
+                            url:'/data/deleteInfobyId?id=' + id,
+                            method: 'GET',
+                            contentType: "application/json; charset=utf-8",
+                            success:function(res){
+                                layer.msg("删除成功",{
+                                    time:1000
+                                },function(){
+                                    table.reload('rootTable')
+                                });
+                            }
+                        })
+                    }
+                );
+            }
+        } ;
+        form.on('select(root-tree)', function(data){
+            active.getTree(data.value);
+        }); 
+        active.getBaseInfo();
+        $("#treeButtonGroup").on("click","a",function(){
+            var event = $(this).attr("data-method");
+            switch(event){
+                case "edit":
+                    active.edit($(this));
+                    break;
+                case "add":
+                    active.add($(this))
+                    break;
+            }
+        })
+    })
+</script>

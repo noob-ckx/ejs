@@ -1,0 +1,154 @@
+<div class="layui-card" >
+        <div class="layui-card-header">搜索图片</div>
+        <div class="layui-card-body">
+        <form action="" class="layui-form">
+          <div class="layui-row">
+                <div class="layui-col-md2">
+                    <input type="text" name="imgName" placeholder="请输入将要查询的图片名称" autocomplete="off" class="layui-input" id="imgName">
+                </div>
+                <div class="layui-col-md2" id="imgButtonGroup">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-warm" lay-submit lay-filter="search">查询</button>
+                        <button class="layui-btn layui-btn-primary" type="reset" >重置</button>
+                    </div>
+                </div>
+          </div>
+        </form>
+          <div class="layui-row">
+            <div class="layui-col-md12">
+                <table class="layui-table" id="imgTable" lay-filter="imgTable"></table>
+                
+            </div>
+          </div>
+        </div>
+      </div>
+    <script id="operating" type="text/html" >
+        <a class="layui-btn layui-btn-sm" lay-event="look">查看图片</a>
+        <a class="layui-btn layui-btn-sm" href='{{ d.img }}'>下载图片</a>
+    </script>
+    <script>
+        layui.use(['table','form'],function(){
+            var $ = layui.$,
+                form = layui.form,
+                table = layui.table;
+            var active = {
+                // search:function(){
+                //     var name = $("#imgName").val();
+                //     table.reload("imgTable",{
+                //         url:'/data/searchImg',
+                //         where:{
+                //             name:name
+                //         }
+                //     })
+                // }
+            };
+            form.on('submit(search)',function(data){
+                table.reload("imgTable",{
+                    url:'/data/searchImg',
+                    where:{
+                        name:data.field.imgName
+                    }
+                })
+                return false;
+            });
+            var cols = [
+                [
+                    
+                    {type: 'numbers', title: "#"},
+                    {
+                        field: 'name',
+                        title: '图片名称'
+                    },
+                    {
+                        field: 'img',
+                        title: '图片所在位置'
+                    },
+                    {
+                        field: 'pname',
+                        title: '所属活动'
+                    },
+                    {
+                        field: 'time',
+                        title: '活动创建时间',
+                        sort:true
+                    },
+                    {
+                        field: 'sort',
+                        title: '所在活动中的序号',
+                        sort:true
+                    },
+                    {
+                        fixed: 'right',
+                        title: '操作',
+                        toolbar: '#operating'
+                    }
+                ]
+            ];
+    
+            table.render({
+                elem: '#imgTable',
+                height: 'full-300',
+                cellMinWidth: 80,
+                method: "GET",
+                request: {
+                    pageName: 'page', //页码的参数名称，默认：page
+                    limitName: 'size' //每页数据量的参数名，默认：limit
+                },
+                response: {
+                    statusCode: 200 //成功的状态码，默认：0
+                    , msgName: 'msg' //状态信息的字段名称，默认：msg
+                    , countName: 'total' //数据总数的字段名称，默认：count
+                    , dataName: 'data' //数据列表的字段名称，默认：data
+                },
+                cols: cols,
+                data: [],
+                even: true,
+                size: 'md',
+                page: {
+                    limit: 10,
+                    layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                },
+                text: {
+                    none: '暂无数据呀'
+                }
+            });
+
+            table.on("tool(imgTable)",function(obj){
+                var data = obj.data;
+                var event = obj.event;
+                if(event == 'look'){
+                    var datas = {
+                        "title": data.pname, //相册标题
+                        "id": data.pid, //相册id
+                        // "start": data, //初始显示的图片序号，默认0
+                        "data": [   //相册包含的图片，数组格式
+                            {
+                            "alt": data.name,
+                            "pid": data.id, //图片id
+                            "src": data.img, //原图地址
+                            "thumb": data.img //缩略图地址
+                            }
+                        ]
+                    }
+                    layer.photos({
+                        photos: datas
+                        ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                    });
+                }else if(event == 'load'){
+                    $.ajax({
+                        url:'/data/loadImg?img=' + data.img,
+                        method: 'GET',
+                        contentType: "application/json; charset=utf-8",
+                        success:function(res){
+                            
+                        }
+                    })
+                }
+            });
+            
+            $('#imgButtonGroup .layui-btn').on('click', function () {
+                var othis = $(this), method = othis.data('method');
+                active[method] ? active[method].call(this, othis) : '';
+            });
+        })
+    </script>

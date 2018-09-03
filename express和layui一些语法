@@ -1,0 +1,23 @@
+// /tag/:id
+//req.params.id
+
+//?id=xxx
+//req.query.id
+
+//data:json
+//req.body
+
+//var device = layui.device();layui获取设备信息
+// {
+//   os: "windows" //底层操作系统，windows、linux、mac等
+//   ,ie: false //ie6-11的版本，如果不是ie浏览器，则为false
+//   ,weixin: false //是否微信环境
+//   ,android: false //是否安卓系统
+//   ,ios: false //是否ios系统
+// }
+
+你要验证当前的WebView是否在你的App环境，即可通过上述的myapp（即为Native给Webview插入的标识，可以随意定义）来判断
+var device = layui.device('myapp');
+if(device.myapp){
+  alert('在我的App环境');
+}  

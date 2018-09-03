@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #eee">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <script src="/layui/layui.js"></script>
+    <title>新增根节点</title>
+</head>
+<body>
+    <div class="layui-card">
+        
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="editForm">
+                <div class="layui-form-item">
+                    <label class="layui-form-label layui-elip">
+                        <span style="color: red;">*</span>
+                        <span>主站名称</span>
+                    </label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" required lay-verify="required"
+                                autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="updateRoot">提交
+                        </button>
+                        <button class="layui-btn layui-btn-primary" type="reset" >重置
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        var id = "<%= id %>";
+        
+        layui.use(['form','element'],function(){
+            var $ = layui.$,
+                element = layui.element,
+                pindex = parent.layer.getFrameIndex(window.name),
+                form = layui.form;
+            var active = {
+                getInfo:function(){
+                    $.ajax({
+                        url:'/data/getInfobyId?id=' + id,
+                        method: 'GET',
+                        contentType: "application/json; charset=utf-8",
+                        success:function(res){
+                            form.val("editForm", {
+                                "title": res.data.title
+                            })
+                        }
+                    })
+                }
+            };
+            active.getInfo();
+            form.on('submit(updateRoot)', function (data) {
+                data.field.id = id;
+                $.ajax({
+                    url:'/data/upDateInfobyId',
+                    method: 'POST',
+                    data:JSON.stringify(data.field),
+                    contentType: "application/json; charset=utf-8",
+                    success:function(res){
+                        layer.msg("更新成功",{
+                            time:1000
+                        },function(){
+                            parent.layer.close(pindex);
+                        });
+                    }
+                })
+                return false;
+            })
+        })
+    </script>
+</body>
+</html>

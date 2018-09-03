@@ -1,0 +1,124 @@
+<div class="layui-card" id="rootButtonGroup" >
+    <div class="layui-card-header">节点管理</div>
+    <div class="layui-card-body">
+      <div class="layui-row">
+          <div class="layui-col-md12">
+            <button class="layui-btn" data-method="add">
+                <i class="layui-icon">&#xe608;</i> 新增根节点
+            </button>
+          </div>
+      </div>
+      <div class="layui-row">
+        <div class="layui-col-md12">
+            <table class="layui-table" id="rootTable" lay-filter="rootTable"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+<script id="operating" type="text/html" >
+    <a class="layui-btn layui-btn-sm" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</a>
+</script>
+<script>
+    layui.use(['table'],function(){
+        var $ = layui.$,
+            table = layui.table;
+        var active = {
+            add:function(){
+                layer.open({
+                    type: 2,
+                    title: '新增根节点',
+                    area: ['500px', '200px'],
+                    maxmin: true,
+                    content: '/add',
+                    end: function () {
+                        table.reload('rootTable')
+                    }
+                });
+            }
+        };
+        var cols = [
+            [
+                
+                {type: 'numbers', title: "#"},
+                {
+                    field: 'title',
+                    title: '根名称'
+                },
+                {
+                    fixed: 'right',
+                    title: '操作',
+                    toolbar: '#operating'
+                }
+            ]
+        ];
+
+        table.render({
+            elem: '#rootTable',
+            height: 'full-280',
+            cellMinWidth: 80,
+            url: '/data/rootList',
+            method: "GET",
+            request: {
+                pageName: 'page', //页码的参数名称，默认：page
+                limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            response: {
+                statusCode: 200 //成功的状态码，默认：0
+                , msgName: 'msg' //状态信息的字段名称，默认：msg
+                , countName: 'total' //数据总数的字段名称，默认：count
+                , dataName: 'data' //数据列表的字段名称，默认：data
+            },
+            cols: cols,
+            data: [],
+            even: true,
+            size: 'md',
+            page: {
+                limit: 10,
+                layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+            },
+            text: {
+                none: '暂无数据呀'
+            }
+        });
+        table.on("tool(rootTable)",function(obj){
+            if(obj.event == 'edit'){
+                layer.open({
+                    type: 2,
+                    title: '修改根节点',
+                    area: ['500px', '200px'],
+                    maxmin: true,
+                    content: '/edit?id=' + obj.data.id,
+                    end: function () {
+                        table.reload('rootTable')
+                    }
+                });
+            }else{
+                layer.confirm("确定删除吗？", {
+                        title: "警告",
+                        btn: ['确认', '取消']
+                    },
+                    function (index) {
+                        $.ajax({
+                            url:'/data/deleteInfobyId?id=' + obj.data.id,
+                            method: 'GET',
+                            contentType: "application/json; charset=utf-8",
+                            success:function(res){
+                                layer.msg("删除成功",{
+                                    time:1000
+                                },function(){
+                                    table.reload('rootTable')
+                                });
+                            }
+                        })
+                    }
+                );
+            }
+            
+        })
+        $('#rootButtonGroup .layui-btn').on('click', function () {
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+    })
+</script>

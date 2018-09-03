@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>express</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+  <script src="/layui/layui.js"></script>
+  <script src="/javascripts/basic-tree.js"></script>
+  <script src="/javascripts/checkbox-tree.js"></script>
+  <script src="/javascripts/layui-xtree.js"></script>
+</head>
+
+<body class="layui-layout-body">
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header" style="background-color: white">
+      <div class="layui-logo" style="background-color: #23262E">express</div>
+      <ul class="layui-nav layui-layout-left" >
+        <!-- <li class="layui-nav-item">
+          <a href=""></a>
+        </li> -->
+        <!-- <li class="layui-nav-item">
+          <a href="">商品管理</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="">用户</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">其它系统</a>
+          <dl class="layui-nav-child">
+            <dd>
+              <a href="">邮件管理</a>
+            </dd>
+            <dd>
+              <a href="">消息管理</a>
+            </dd>
+            <dd>
+              <a href="">授权管理</a>
+            </dd>
+          </dl>
+        </li> -->
+      </ul>
+      <!-- <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+          <a href="javascript:;">
+            <img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 用户
+          </a>
+          <dl class="layui-nav-child">
+            <dd>
+              <a href="">退出</a>
+            </dd>
+          </dl>
+        </li>
+      </ul> -->
+    </div>
+
+    <div class="layui-side layui-bg-black">
+      <div class="layui-side-scroll">
+        <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+        <ul class="layui-nav layui-nav-tree" lay-filter="test">
+          <li class="layui-nav-item layui-nav-itemed">
+            <a class="" href="javascript:;">所有商品</a>
+            <dl class="layui-nav-child">
+              <dd class="layui-this">
+                <a href="#" data-to="a" >根节点管理</a>
+              </dd>
+              <dd>
+                <a href="javascript:;" data-to="b">树形图</a>
+              </dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;">表格管理</a>
+            <dl class="layui-nav-child">
+              <dd>
+                <a href="javascript:;" data-to="c">列表</a>
+              </dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;">查看</a>
+            <dl class="layui-nav-child">
+              <dd>
+                <a href="javascript:;" data-to="d">搜索图片</a>
+              </dd>
+            </dl>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layui-body" id="hash" style="padding: 15px;background-color: #eee">
+      <!-- 内容主体区域 -->
+      
+        <%- include('./root/management'); %>
+    
+      
+    </div>
+
+    <div class="layui-footer">
+      <!-- 底部固定区域 -->
+      © layui.com - 底部固定区域
+    </div>
+  </div>
+  <script>
+    //JavaScript代码区域
+    layui.use('element', function () {
+      var element = layui.element,
+          $ = layui.$;
+
+      element.on('nav(test)', function (elem) {
+        var page = elem.attr("data-to");
+        $.ajax({
+          url:'/' + page,
+          method: 'GET',
+          contentType: "application/json; charset=utf-8",
+          dataType:'html',
+          success:function(res){
+            $("#hash").html(res)
+          }
+        })
+      });
+    });
+  </script>
+</body>
+
+</html>

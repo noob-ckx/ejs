@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #eee">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <script src="/layui/layui.js"></script>
+    <title>新增根节点</title>
+</head>
+<body>
+    <div class="layui-card">
+        
+        <div class="layui-card-body">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label layui-elip">
+                        <span style="color: red;">*</span>
+                        <span>名称</span>
+                    </label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" required lay-verify="required"
+                                autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label layui-elip">
+                        <span style="color: red;">*</span>
+                        <span>日期</span>
+                    </label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="time" name="time" required lay-verify="required">
+                    </div>
+                </div>
+            
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="addRoot">提交
+                        </button>
+                        <button class="layui-btn layui-btn-primary" type="reset" >重置
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        layui.use(['form','laydate'],function(){
+            var $ = layui.$,
+                laydate = layui.laydate,
+                pindex = parent.layer.getFrameIndex(window.name),
+                form = layui.form;
+                laydate.render({ 
+                    elem: '#time'
+                    ,type: 'datetime'
+                });
+            form.on('submit(addRoot)', function (data) {
+                console.log(data.field)
+                $.ajax({
+                    url:'/data/addTable',
+                    method: 'POST',
+                    data:JSON.stringify(data.field),
+                    contentType: "application/json; charset=utf-8",
+                    success:function(res){
+                        layer.msg("添加成功",{
+                            time:1000
+                        },function(){
+                            parent.layer.close(pindex);
+                        });
+                    }
+                })
+                return false;
+            })
+        })
+    </script>
+</body>
+</html>

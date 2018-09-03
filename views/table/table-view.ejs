@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #eee">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    
+    <title>新增根节点</title>
+    <style>
+        #viewTable {
+            line-height: 32px;
+        }
+    
+        #viewTable li {
+            box-sizing: border-box;
+            border-bottom: 0.5px dashed #dddddd;
+        }
+    
+        #viewTable ul {
+            box-sizing: border-box;
+            border-top: 0.5px dashed #dddddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-card" id="tableButtonGroup">
+        <!-- <div class="layui-card-header">卡片面板</div> -->
+        <div class="layui-card-body">
+            <div class="layui-row layui-col-space20">
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">表格呀</div>
+                        <div class="layui-card-body">
+                            <div class="layui-row">
+                                <div class="layui-col-md12">
+                                    <button class="layui-btn" data-method="export">导出EXCEL</button> 
+                                    <button class="layui-btn" data-method="importImg">上传图片</button> 
+                                </div>
+                            </div>
+                            <div class="layui-row">
+                                <div class="lauii-col-md12">
+                                    <table class="layui-table" id="vTable" lay-filter="vTable"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md8">
+                        <div class="layui-card">
+                            <div class="layui-card-header">
+                                <form class="layui-form">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">选择根节点</label>
+                                        <div class="layui-input-block">
+                                        <select name="rootId" lay-filter="view-tree" id="view-tree">
+                                            <!-- <option value="0">写作</option>
+                                            <option value="1">阅读</option> -->
+                                        </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="layui-card-body">
+                                <form class="layui-form" style="min-width: 500px;overflow-y: auto;">
+                                    <div style="font-size: 15px;line-height: 35px;border: 1px dashed #cccccc;padding:0 10px;">
+                                        <span>名称</span>
+                                    </div>
+                                    <div id="viewTable"
+                                            style="box-sizing: border-box;border-left:1px dashed #cccccc;border-right:1px dashed #cccccc;padding:0 10px;"></div>
+                                </form>
+
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id="operating" type="text/html" >
+        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="insert">向上插入一条数据</a>
+        {{# if(d.img){ }}
+        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="load">下载图片</a>
+        {{# } }}
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+    </script>
+
+
+    <script src="/layui/layui.js"></script>
+    <script src="/javascripts/basic-tree.js"></script>
+    <script src="/javascripts/checkbox-tree.js"></script>
+    <script src="/javascripts/layui-xtree.js"></script>
+    <script>
+        var id = "<%= id %>";
+        layui.use(['form','table'],function(){
+            var $ = layui.$,
+                laydate = layui.laydate,
+                table = layui.table,
+                form = layui.form;
+            var active = {
+                getBaseInfo:function(){
+                    $.ajax({
+                        url:'/data/rootList',
+                        method: 'GET',
+                        contentType: "application/json; charset=utf-8",
+                        success:function(res){
+                            var rootArr = res.data;
+                            var str = "<option value=''></option>";
+                            for(let i = 0 ; i < rootArr.length ;i++){
+                                str += "<option value='"+ rootArr[i].id +"'>" + rootArr[i].title+ "</option>"
+                            }
+                            $("#view-tree").html(str);
+                            form.render('select');
+                        }
+                    })
+                },
+                getTree:function(ids){
+                    $.ajax({
+                        url:'/data/checkboxTree?id=' + ids + "&activeId=" + id,
+                        method: 'GET',
+                        contentType: "application/json; charset=utf-8",
+                        success:function(res){
+                            console.log(res)
+                            new layuiBasicTree({
+                                elem: 'viewTable',
+                                form: form,
+                                data: [res],
+                                disableClick: true,
+                                operateRender: function (data) {
+                                    if(data['children']){
+                                        return "";
+                                    }else{
+                                        if(data.checked){
+                                            return "";
+                                        }else{
+                                            return '<span style="width: 240px;display: inline-block;text-align: center;"><a class="layui-btn layui-btn-warm layui-btn-xs" id="' + data.id + '" rootid="' + data.rootid + '" data-method="add">加入</a></span>';
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                            });
+                            $('#tableButtonGroup .layui-btn').on('click', function () {
+                                var othis = $(this), method = othis.data('method');
+                                active[method] ? active[method].call(this, othis) : '';
+                            });
+                        }
+                    })
+                },
+                export:function(){
+                    $.ajax({
+                        url:'/data/export?id=' + id,
+                        method: 'GET',
+                        contentType: "application/json; charset=utf-8",
+                        success:function(res){
+                            console.log(res)
+                            window.location.href = res
+                        }
+                    })
+                },
+                importImg:function(){
+                    layer.open({
+                        type: 2,
+                        title: '上传图片',
+                        area: ['70%', '90%'],
+                        maxmin: true,
+                        content: '/table/changeImg?id=' + id,
+                        end: function () {
+                            table.reload('vTable');
+                            // active.getTree($("#view-tree").val())
+                        }
+                    });
+                },
+                add:function(othis){
+                    var childId = $(othis).attr('id');
+                    layer.confirm("确定添加吗？", {
+                            title: "提示",
+                            btn: ['确认', '取消']
+                        },
+                        function (index) {
+                            $.ajax({
+                                url:'/data/addvList?childId=' + childId + "&id=" + id,
+                                method: 'GET',
+                                contentType: "application/json; charset=utf-8",
+                                success:function(res){
+                                    layer.close(index)
+                                    table.reload('vTable');
+                                    active.getTree($("#view-tree").val())
+                                }
+                            })
+                        }
+                    );
+                    
+                }
+            };
+            
+            form.on('select(view-tree)', function(data){
+                if(data.value){
+                    active.getTree(data.value);
+                }
+            }); 
+            active.getBaseInfo();
+            var cols = [
+                [
+                    
+                    {type: 'numbers', title: "#"},
+                    {
+                        field: 'name',
+                        title: '名称',
+                        minWidth:'150'
+                    },
+                    {
+                        title: '图片',
+                        minWidth:'150',
+                        templet:function(d){
+                            if(d.img){
+                                return d.img
+                            }else{
+                                return "待上传"
+                            }
+                        }
+                    },
+                    {
+                        fixed: 'right',
+                        title: '操作',
+                        width:'250',
+                        toolbar: '#operating'
+                    }
+                ]
+            ];
+
+            table.render({
+                elem: '#vTable',
+                height: 'full',
+                cellMinWidth: 80,
+                url: '/data/vList?id=' + id,
+                method: "GET",
+                request: {
+                    pageName: 'page', //页码的参数名称，默认：page
+                    limitName: 'size' //每页数据量的参数名，默认：limit
+                },
+                response: {
+                    statusCode: 200 //成功的状态码，默认：0
+                    , msgName: 'msg' //状态信息的字段名称，默认：msg
+                    , countName: 'total' //数据总数的字段名称，默认：count
+                    , dataName: 'data' //数据列表的字段名称，默认：data
+                },
+                cols: cols,
+                data: [],
+                even: true,
+                size: 'md',
+                page: {
+                    limit: 10,
+                    layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                },
+                text: {
+                    none: '暂无数据呀'
+                }
+            });
+            //重定向会使table不渲染  BUG
+            table.reload('vTable');
+            table.on("tool(vTable)",function(obj){
+                var event = obj.event;
+                if(event == "delete"){
+                    layer.confirm("确定删除吗？", {
+                            title: "提示",
+                            btn: ['确认', '取消']
+                        },
+                        function (index) {
+                            $.ajax({
+                                url:'/data/deleteTable?id=' + obj.data.id + "&pid=" + id,
+                                method: 'POST',
+                                contentType: "application/json; charset=utf-8",
+                                success:function(res){
+                                    layer.close(index)
+                                    table.reload('vTable');
+                                    active.getTree($("#view-tree").val())
+                                }
+                            })
+                        }
+                    );
+                }else if(event == "insert"){
+                    layer.open({
+                        type: 2,
+                        title: '向上插入一条数据',
+                        area: ['70%', '90%'],
+                        maxmin: true,
+                        content: '/table/insert?id=' + obj.data.id + '&pid=' + id,
+                        end: function () {
+                            table.reload('vTable');
+                            active.getTree($("#view-tree").val())
+                        }
+                    });
+                } else if(event == "load"){
+                    window.open(obj.data.img)
+                }  
+            });
+            $('#tableButtonGroup .layui-btn').on('click', function () {
+                var othis = $(this), method = othis.data('method');
+                active[method] ? active[method].call(this, othis) : '';
+            });
+     
+        })
+    </script>
+</body>
+</html>
