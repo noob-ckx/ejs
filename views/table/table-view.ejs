@@ -28,7 +28,7 @@
         <!-- <div class="layui-card-header">卡片面板</div> -->
         <div class="layui-card-body">
             <div class="layui-row layui-col-space20">
-                <div class="layui-col-md4">
+                <div class="layui-col-md6">
                     <div class="layui-card">
                         <div class="layui-card-header">表格呀</div>
                         <div class="layui-card-body">
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="layui-col-md8">
+                <div class="layui-col-md6">
                         <div class="layui-card">
                             <div class="layui-card-header">
                                 <form class="layui-form">
@@ -74,12 +74,13 @@
                         </div>
                 </div>
             </div>
+            
         </div>
     </div>
     <script id="operating" type="text/html" >
         <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="insert">向上插入一条数据</a>
         {{# if(d.img){ }}
-        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="load">下载图片</a>
+        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="load">查看图片</a>
         {{# } }}
         <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
     </script>
@@ -161,7 +162,7 @@
                     layer.open({
                         type: 2,
                         title: '上传图片',
-                        area: ['70%', '90%'],
+                        area: ['500px', '200px'],
                         maxmin: true,
                         content: '/table/changeImg?id=' + id,
                         end: function () {
@@ -253,7 +254,7 @@
                     layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
                 },
                 text: {
-                    none: '暂无数据呀'
+                    none: '暂无数据'
                 }
             });
             //重定向会使table不渲染  BUG
@@ -291,7 +292,22 @@
                         }
                     });
                 } else if(event == "load"){
-                    window.open(obj.data.img)
+                    var datas = {
+                        "title": obj.data.name, 
+                        "id": obj.data.id, 
+                        "data": [   
+                            {
+                            "alt": obj.data.name,
+                            "pid": obj.data.id, 
+                            "src": obj.data.img, 
+                            "thumb": obj.data.img 
+                            }
+                        ]
+                    }
+                    layer.photos({
+                        photos: datas
+                        ,anim: 5
+                    });
                 }  
             });
             $('#tableButtonGroup .layui-btn').on('click', function () {

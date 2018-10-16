@@ -3,6 +3,7 @@ var ejsExcel = require("ejsExcel");
 var fs = require("fs");
 var router = express.Router();
 var db = require('./mysql');
+var request = require("request");
 
 //返回数据格式待优化
 function resTable(res,code,msg,total){
@@ -142,6 +143,7 @@ router.get('/tableList', function(req, res) {
   let page = req.query.page;
   let size = req.query.size;
   db("SELECT * FROM list ",function(result){
+    console.log(result)
       let len = result.length;
       let r = result;
       if(page && size){
@@ -204,6 +206,32 @@ router.post('/addTable', function(req, res) {
     res.send(result); 
   }) 
 });
+
+//根据Id查找台账
+//发送：xxx?xx=&xx=
+//获取：req.query.xx
+router.get('/listId', function(req, res) {
+  db("SELECT * FROM list WHERE id = " + req.query.id,function(result){
+    res.send(resTable(result[0],200,'',result.length))
+  })  
+});
+//根据Id删除台账
+//发送：xxx?xx=&xx=
+//获取：req.query.xx
+router.get('/listdeleteId', function(req, res) {
+  db("DELETE FROM list WHERE id = " + req.query.id,function(result){
+    res.send(result)
+  })  
+});
+//根据Id更新台账
+//发送：JSON.stringify(data)
+//获取：req.body.xxx
+router.post('/upDatelistId', function(req, res) {
+  db("UPDATE list SET name = '" + req.body.name +"' WHERE id = " + req.body.id,function(result){
+    res.send(result)
+  })  
+});
+
 //获取台账详情
 router.get('/vList', function(req, res) {
   let page = req.query.page;
@@ -350,7 +378,7 @@ router.post('/changeName', function(req, res) {
             return ;
           }else{
             db("UPDATE info SET img = '/images/"  + req.query.path + "/"+ result[index].name +".jpg' WHERE id = " + element.id,function(result){
-              
+              console.log(result);
             })
           }
         })
@@ -379,10 +407,8 @@ router.get('/searchImg', function(req, res) {
 
 })
 
-router.get('/loadImg', function(req, res) {
-  res.sendFile("." + req.query.img,function(err){
-    console.log(err)
-  })
-})
+// router.get('/loadImg', function(req, res) {
+//   console.log(__dirname)
+// })
 
 module.exports = router;

@@ -88,48 +88,49 @@
         });
         table.on("tool(tTable)",function(obj){
             if(obj.event == 'edit'){
-                // layer.open({
-                //     type: 2,
-                //     title: '修改根节点',
-                //     area: ['500px', '200px'],
-                //     maxmin: true,
-                //     content: '/edit?id=' + obj.data.id,
-                //     end: function () {
-                //         table.reload('rootTable')
-                //     }
-                // });
+                layer.open({
+                    type: 2,
+                    title: '修改根节点',
+                    area: ['500px', '200px'],
+                    maxmin: true,
+                    content: '/table/changelist?id=' + obj.data.id,
+                    end: function () {
+                        table.reload('tTable')
+                    }
+                });
             }else if(obj.event == 'view'){
-                var fulllayer = layer.open({
+                // var fulllayer = layer.open({
+                layer.open({
                     type: 2,
                     title: '详情',
-                    // area: ['500px', '200px'],
+                    area: ['80%', '80%'],
                     maxmin: true,
                     content: '/table/view?id=' + obj.data.id,
                     end: function () {
-                        table.reload('rootTable')
+                        table.reload('tTable')
                     }
                 });
-                layer.full(fulllayer)
+                // layer.full(fulllayer)
             }else{
-                // layer.confirm("确定删除吗？", {
-                //         title: "警告",
-                //         btn: ['确认', '取消']
-                //     },
-                //     function (index) {
-                //         $.ajax({
-                //             url:'/data/deleteInfobyId?id=' + obj.data.id,
-                //             method: 'GET',
-                //             contentType: "application/json; charset=utf-8",
-                //             success:function(res){
-                //                 layer.msg("删除成功",{
-                //                     time:1000
-                //                 },function(){
-                //                     table.reload('rootTable')
-                //                 });
-                //             }
-                //         })
-                //     }
-                // );
+                layer.confirm("确定删除吗？", {
+                        title: "警告",
+                        btn: ['确认', '取消']
+                    },
+                    function (index) {
+                        $.ajax({
+                            url:'/data/listdeleteId?id=' + obj.data.id,
+                            method: 'GET',
+                            contentType: "application/json; charset=utf-8",
+                            success:function(res){
+                                layer.msg("删除成功",{
+                                    time:1000
+                                },function(){
+                                    table.reload('tTable')
+                                });
+                            }
+                        })
+                    }
+                );
             }
             
         })

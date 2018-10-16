@@ -24,7 +24,7 @@
       </div>
     <script id="operating" type="text/html" >
         <a class="layui-btn layui-btn-sm" lay-event="look">查看图片</a>
-        <a class="layui-btn layui-btn-sm" href='{{ d.img }}'>下载图片</a>
+        <!-- <a class="layui-btn layui-btn-sm" lay-event="load">下载图片</a> -->
     </script>
     <script>
         layui.use(['table','form'],function(){
@@ -32,15 +32,7 @@
                 form = layui.form,
                 table = layui.table;
             var active = {
-                // search:function(){
-                //     var name = $("#imgName").val();
-                //     table.reload("imgTable",{
-                //         url:'/data/searchImg',
-                //         where:{
-                //             name:name
-                //         }
-                //     })
-                // }
+                
             };
             form.on('submit(search)',function(data){
                 table.reload("imgTable",{
@@ -132,17 +124,17 @@
                     }
                     layer.photos({
                         photos: datas
-                        ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                        ,anim: 5 
                     });
                 }else if(event == 'load'){
-                    $.ajax({
-                        url:'/data/loadImg?img=' + data.img,
-                        method: 'GET',
-                        contentType: "application/json; charset=utf-8",
-                        success:function(res){
-                            
-                        }
-                    })
+                    // $.ajax({
+                    //     url:'/data/loadImg?img=' + data.img,
+                    //     method: 'GET',
+                    //     contentType: "application/json; charset=utf-8",
+                    //     success:function(res){
+                    //         // window.open(res)
+                    //     }
+                    // })
                 }
             });
             

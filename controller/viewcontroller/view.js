@@ -8,6 +8,7 @@ router.get('/', function (req, res, next) {
   res.render('index');
 });
 
+
 //根节点管理
 router.get('/management', function (req, res, next) {
   res.render('root/management');
@@ -32,6 +33,11 @@ router.get('/tree/add', function (req, res, next) {
 router.get('/table/list', function (req, res, next) {
   res.render('table/table-list');
 });
+
+router.get('/table/changelist', function (req, res, next) {
+  res.render('table/changelist',{id: req.query.id});
+});
+
 router.get('/table/add', function (req, res, next) {
   res.render('table/table-add');
 });

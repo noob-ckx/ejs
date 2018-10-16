@@ -15,7 +15,7 @@
 <body class="layui-layout-body">
   <div class="layui-layout layui-layout-admin">
     <div class="layui-header" style="background-color: white">
-      <div class="layui-logo" style="background-color: #23262E">express</div>
+      <div class="layui-logo" style="background-color: #23262E">台账管理系统</div>
       <ul class="layui-nav layui-layout-left" >
         <!-- <li class="layui-nav-item">
           <a href=""></a>
@@ -60,7 +60,7 @@
         <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
         <ul class="layui-nav layui-nav-tree" lay-filter="test">
           <li class="layui-nav-item layui-nav-itemed">
-            <a class="" href="javascript:;">所有商品</a>
+            <a class="" href="javascript:;">节点管理</a>
             <dl class="layui-nav-child">
               <dd class="layui-this">
                 <a href="#" data-to="a" >根节点管理</a>
@@ -71,10 +71,10 @@
             </dl>
           </li>
           <li class="layui-nav-item">
-            <a href="javascript:;">表格管理</a>
+            <a href="javascript:;">台账管理</a>
             <dl class="layui-nav-child">
               <dd>
-                <a href="javascript:;" data-to="c">列表</a>
+                <a href="javascript:;" data-to="c">台账列表</a>
               </dd>
             </dl>
           </li>
@@ -94,13 +94,12 @@
       <!-- 内容主体区域 -->
       
         <%- include('./root/management'); %>
-    
+        
       
     </div>
 
     <div class="layui-footer">
-      <!-- 底部固定区域 -->
-      © layui.com - 底部固定区域
+      <!-- © layui.com - 底部固定区域 -->
     </div>
   </div>
   <script>
@@ -108,7 +107,6 @@
     layui.use('element', function () {
       var element = layui.element,
           $ = layui.$;
-
       element.on('nav(test)', function (elem) {
         var page = elem.attr("data-to");
         $.ajax({
